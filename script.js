@@ -1,82 +1,116 @@
-const teamThemes = {
-  "Paris Saint-Germain": { bg:"#004170", fg:"#fff", slogan:"Allez Paris!" },
-  "Real Madrid": { bg:"#ffffff", fg:"#111", slogan:"Hala Madrid!" },
-  "Manchester City": { bg:"#6CABDD", fg:"#003A8F", slogan:"City 'Til I Die" },
-  "Bayern Munich": { bg:"#D00A25", fg:"#fff", slogan:"Mia san Mia" },
-  "Liverpool": { bg:"#C8102E", fg:"#fff", slogan:"You'll Never Walk Alone" },
-  "Inter Milan": { bg:"#0058A3", fg:"#fff", slogan:"Nerazzurri" },
-  "Chelsea": { bg:"#034694", fg:"#fff", slogan:"Keep the Blue Flag Flying High" },
-  "Borussia Dortmund": { bg:"#F7E600", fg:"#000", slogan:"Echte Liebe" },
-  "Barcelona": { bg:"#00205B", fg:"#FF4B55", slogan:"Més que un club" },
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-  "Arsenal": { bg:"#EF4135", fg:"#fff", slogan:"Victoria Concordia Crescit" },
-  "Juventus": { bg:"#000", fg:"#fff", slogan:"Fino Alla Fine" },
-  "Galatasaray": { bg:"#A32638", fg:"#F6B500", slogan:"Cim Bom Bom!" },
-  "Napoli": { bg:"#4B92DB", fg:"#fff", slogan:"Forza Napoli Sempre" }
-};
+canvas.width = 600;
+canvas.height = 400;
 
-const pots = {
-  1: ["Paris Saint-Germain","Real Madrid","Manchester City","Bayern Munich","Liverpool","Inter Milan","Chelsea","Borussia Dortmund","Barcelona"],
-  2: ["Arsenal","Juventus"],
-  3: ["Napoli","Galatasaray"]
-};
+// Paddles
+const paddleWidth = 10, paddleHeight = 80;
+let playerY = (canvas.height - paddleHeight)/2;
+let aiY = (canvas.height - paddleHeight)/2;
+const paddleSpeed = 5;
 
-let fixtures = {};
+// Ball
+let ballX = canvas.width/2;
+let ballY = canvas.height/2;
+let ballRadius = 10;
+let ballSpeedX = 4;
+let ballSpeedY = 3;
 
-function randomPick(arr, n) {
-  return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+// Score
+let playerScore = 0;
+let aiScore = 0;
+
+// Controls
+let upPressed = false;
+let downPressed = false;
+
+document.addEventListener("keydown", e => {
+  if(e.key === "ArrowUp") upPressed = true;
+  if(e.key === "ArrowDown") downPressed = true;
+});
+document.addEventListener("keyup", e => {
+  if(e.key === "ArrowUp") upPressed = false;
+  if(e.key === "ArrowDown") downPressed = false;
+});
+
+function draw() {
+  // Clear
+  ctx.fillStyle = "#0a1330";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Net
+  ctx.fillStyle = "#FFD700";
+  ctx.fillRect(canvas.width/2 - 1, 0, 2, canvas.height);
+
+  // Paddles
+  ctx.fillStyle = "#00FFCC";
+  ctx.fillRect(10, playerY, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#FF3C00";
+  ctx.fillRect(canvas.width - 20, aiY, paddleWidth, paddleHeight);
+
+  // Ball
+  ctx.fillStyle = "#FFD700";
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+  ctx.fill();
+
+  // Scores
+  ctx.fillStyle = "#fff";
+  ctx.font = "24px Arial";
+  ctx.fillText(playerScore, canvas.width/4, 30);
+  ctx.fillText(aiScore, 3*canvas.width/4, 30);
 }
 
-function drawFixtures() {
-  const container = document.getElementById("teams");
-  container.innerHTML = "";
-  fixtures = {};
+function update() {
+  // Move paddles
+  if(upPressed && playerY > 0) playerY -= paddleSpeed;
+  if(downPressed && playerY + paddleHeight < canvas.height) playerY += paddleSpeed;
 
-  Object.values(pots).flat().forEach(team => {
-    fixtures[team] = [];
+  // Move AI paddle
+  if(aiY + paddleHeight/2 < ballY) aiY += 3;
+  else aiY -= 3;
 
-    Object.values(pots).forEach(pot => {
-      const possible = pot.filter(t => t !== team);
-      if (possible.length >= 2) {
-        const [h,a] = randomPick(possible, 2);
-        fixtures[team].push({team:h, venue:"H"});
-        fixtures[team].push({team:a, venue:"A"});
-      }
-    });
+  // Move ball
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
 
-    const theme = teamThemes[team] || {bg:"#333", fg:"#fff", slogan:""};
-    const card = document.createElement("div");
-    card.className = "team-card";
-    card.style.background = theme.bg;
-    card.style.color = theme.fg;
-    card.innerHTML = `<h3>${team}</h3>`;
-    card.onclick = () => openModal(team);
-    container.appendChild(card);
-  });
+  // Collisions with top/bottom
+  if(ballY + ballRadius > canvas.height || ballY - ballRadius < 0) ballSpeedY *= -1;
+
+  // Collisions with paddles
+  if(ballX - ballRadius < 20 && ballY > playerY && ballY < playerY + paddleHeight) {
+    ballSpeedX *= -1;
+  }
+  if(ballX + ballRadius > canvas.width - 20 && ballY > aiY && ballY < aiY + paddleHeight) {
+    ballSpeedX *= -1;
+  }
+
+  // Score
+  if(ballX - ballRadius < 0) {
+    aiScore++;
+    resetBall();
+  }
+  if(ballX + ballRadius > canvas.width) {
+    playerScore++;
+    resetBall();
+  }
 }
 
-function openModal(team) {
-  const modal = document.getElementById("modal");
-  const theme = teamThemes[team];
-
-  document.getElementById("modalTitle").innerText = team;
-  document.getElementById("modalSlogan").innerText = `"${theme.slogan}"`;
-
-  const list = document.getElementById("modalFixtures");
-  list.innerHTML = fixtures[team]
-    .map(f => `<div class="fixture">${f.team} (${f.venue})</div>`)
-    .join("");
-
-  const card = document.getElementById("modalContent");
-  card.style.background = theme.bg;
-  card.style.color = theme.fg;
-
-  modal.classList.remove("hidden");
+function resetBall() {
+  ballX = canvas.width/2;
+  ballY = canvas.height/2;
+  ballSpeedX = -ballSpeedX;
+  ballSpeedY = 3 * (Math.random() > 0.5 ? 1 : -1);
 }
 
-document.getElementById("closeBtn").onclick =
-  () => document.getElementById("modal").classList.add("hidden");
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
 
-document.getElementById("drawBtn").onclick = drawFixtures;
+gameLoop();
+
 
 
