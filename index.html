@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UCL Fixture Draw</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UCL Fixture Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>UEFA Champions League</h1>
-<button id="drawBtn">Draw Fixtures</button>
+<header>
+  <h1>🏆 UEFA Champions League</h1>
+  <p class="subtitle">Interactive Fixture Draw</p>
+  <button id="drawBtn">🎲 Draw Fixtures</button>
+</header>
 
-<div id="teams"></div>
+<main id="teams"></main>
 
-<!-- Team Detail Modal -->
+<!-- MODAL -->
 <div id="modal" class="modal hidden">
-  <div id="modalContent" class="modal-content">
-    <button id="closeBtn">✖</button>
+  <div id="modalContent" class="modal-card">
+    <span id="closeBtn">✖</span>
     <h2 id="modalTitle"></h2>
     <p id="modalSlogan"></p>
     <div id="modalFixtures"></div>
@@ -26,4 +29,5 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
