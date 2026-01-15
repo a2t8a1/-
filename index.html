@@ -9,11 +9,21 @@
 <body>
 
 <h1>UEFA Champions League</h1>
-
 <button id="drawBtn">Draw Fixtures</button>
 
 <div id="teams"></div>
 
+<!-- Team Detail Modal -->
+<div id="modal" class="modal hidden">
+  <div id="modalContent" class="modal-content">
+    <button id="closeBtn">✖</button>
+    <h2 id="modalTitle"></h2>
+    <p id="modalSlogan"></p>
+    <div id="modalFixtures"></div>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
+
