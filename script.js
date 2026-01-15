@@ -4,13 +4,12 @@ const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height = 400;
 
-// Paddles
+// Paddle & Ball
 const paddleWidth = 10, paddleHeight = 80;
 let playerY = (canvas.height - paddleHeight)/2;
 let aiY = (canvas.height - paddleHeight)/2;
 const paddleSpeed = 5;
 
-// Ball
 let ballX = canvas.width/2;
 let ballY = canvas.height/2;
 let ballRadius = 10;
@@ -26,20 +25,12 @@ let maxScore = 10;
 let upPressed = false;
 let downPressed = false;
 
-// Colors
+// Colors & Effects
 let colorful = true;
+let effects = [];
 
-document.addEventListener("keydown", e => {
-  if(e.key === "ArrowUp") upPressed = true;
-  if(e.key === "ArrowDown") downPressed = true;
-});
-document.addEventListener("keyup", e => {
-  if(e.key === "ArrowUp") upPressed = false;
-  if(e.key === "ArrowDown") downPressed = false;
-});
-
-// Menu buttons
-const menu = document.getElementById("menu");
+// Elements
+const overlay = document.getElementById("overlay");
 const startBtn = document.getElementById("startBtn");
 const rulesBtn = document.getElementById("rulesBtn");
 const colorBtn = document.getElementById("colorBtn");
@@ -48,27 +39,26 @@ const menuMessage = document.getElementById("menuMessage");
 const rulesOverlay = document.getElementById("rules");
 const closeRules = document.getElementById("closeRules");
 
-startBtn.addEventListener("click", () => {
-  menu.style.display = "none";
-  canvas.style.display = "block";
-  resetGame();
-  gameLoop();
+// Keyboard Controls
+document.addEventListener("keydown", e => {
+  if(e.key === "ArrowUp" || e.key.toLowerCase() === "w") upPressed = true;
+  if(e.key === "ArrowDown" || e.key.toLowerCase() === "s") downPressed = true;
+});
+document.addEventListener("keyup", e => {
+  if(e.key === "ArrowUp" || e.key.toLowerCase() === "w") upPressed = false;
+  if(e.key === "ArrowDown" || e.key.toLowerCase() === "s") downPressed = false;
 });
 
-rulesBtn.addEventListener("click", () => {
-  rulesOverlay.style.display = "flex";
-});
-
-closeRules.addEventListener("click", () => {
-  rulesOverlay.style.display = "none";
-});
-
+// Overlay buttons
+startBtn.addEventListener("click", () => overlay.classList.add("hidden"));
+rulesBtn.addEventListener("click", () => rulesOverlay.classList.remove("hidden"));
+closeRules.addEventListener("click", () => rulesOverlay.classList.add("hidden"));
 colorBtn.addEventListener("click", () => {
   colorful = !colorful;
   menuMessage.textContent = colorful ? "Colors ON" : "Colors OFF";
 });
 
-// Draw everything
+// Game loop
 function draw() {
   // Background
   ctx.fillStyle = "#0a1330";
@@ -84,10 +74,11 @@ function draw() {
   ctx.fillStyle = colorful ? "#FF3C00" : "#fff";
   ctx.fillRect(canvas.width - 20, aiY, paddleWidth, paddleHeight);
 
-  // Ball
+  // Ball (pulse effect)
+  let pulse = colorful ? 1 + 0.2*Math.sin(Date.now()/100) : 1;
   ctx.fillStyle = colorful ? "#FFD700" : "#fff";
   ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+  ctx.arc(ballX, ballY, ballRadius*pulse, 0, Math.PI*2);
   ctx.fill();
 
   // Scores
@@ -97,12 +88,13 @@ function draw() {
   ctx.fillText(aiScore, 3*canvas.width/4, 30);
 }
 
-// Update game logic
+// Game update logic
 function update() {
+  // Player
   if(upPressed && playerY > 0) playerY -= paddleSpeed;
   if(downPressed && playerY + paddleHeight < canvas.height) playerY += paddleSpeed;
 
-  // AI Paddle
+  // AI
   if(aiY + paddleHeight/2 < ballY) aiY += 3;
   else aiY -= 3;
 
@@ -110,32 +102,26 @@ function update() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  // Bounce top/bottom
+  // Bounce walls
   if(ballY + ballRadius > canvas.height || ballY - ballRadius < 0) ballSpeedY *= -1;
 
   // Bounce paddles
-  if(ballX - ballRadius < 20 && ballY > playerY && ballY < playerY + paddleHeight) {
-    ballSpeedX *= -1;
-    addBallEffect();
-  }
-  if(ballX + ballRadius > canvas.width - 20 && ballY > aiY && ballY < aiY + paddleHeight) {
-    ballSpeedX *= -1;
-    addBallEffect();
-  }
+  if(ballX - ballRadius < 20 && ballY > playerY && ballY < playerY + paddleHeight) { ballSpeedX *= -1; addEffect(); }
+  if(ballX + ballRadius > canvas.width - 20 && ballY > aiY && ballY < aiY + paddleHeight) { ballSpeedX *= -1; addEffect(); }
 
   // Score
   if(ballX - ballRadius < 0) { aiScore++; resetBall(); }
   if(ballX + ballRadius > canvas.width) { playerScore++; resetBall(); }
 
-  // Check winner
-  if(playerScore >= maxScore || aiScore >= maxScore){
-    menu.style.display = "flex";
-    canvas.style.display = "none";
+  // Winner
+  if(playerScore >= maxScore || aiScore >= maxScore) {
+    overlay.classList.remove("hidden");
     menuMessage.textContent = playerScore > aiScore ? "You Win! 🏆" : "AI Wins! 🤖";
+    resetGame();
   }
 }
 
-// Reset ball to center
+// Reset Ball
 function resetBall() {
   ballX = canvas.width/2;
   ballY = canvas.height/2;
@@ -143,13 +129,11 @@ function resetBall() {
   ballSpeedY = 3 * (Math.random() > 0.5 ? 1 : -1);
 }
 
-// Ball effect array
-let effects = [];
-function addBallEffect() {
+// Effects
+function addEffect() {
   for(let i=0;i<5;i++){
     effects.push({
-      x: ballX,
-      y: ballY,
+      x: ballX, y: ballY,
       dx: (Math.random()-0.5)*4,
       dy: (Math.random()-0.5)*4,
       life: 20
@@ -157,9 +141,8 @@ function addBallEffect() {
   }
 }
 
-// Draw effects
 function drawEffects() {
-  effects.forEach((e, i)=>{
+  effects.forEach((e,i)=>{
     ctx.fillStyle = `rgba(255,215,0,${e.life/20})`;
     ctx.beginPath();
     ctx.arc(e.x, e.y, 3, 0, Math.PI*2);
@@ -188,6 +171,10 @@ function resetGame() {
   effects = [];
   resetBall();
 }
+
+// Start loop immediately
+gameLoop();
+
 
 
 
