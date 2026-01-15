@@ -3,14 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pin-Pon Game</title>
+  <title>Pin-Pon Game Deluxe</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🎾 Pin-Pon Game</h1>
+  <div id="menu">
+    <h1>🎾 Pin-Pon Deluxe</h1>
+    <button id="startBtn">Start Game</button>
+    <button id="rulesBtn">Rules</button>
+    <button id="colorBtn">Toggle Colors</button>
+    <p id="menuMessage"></p>
+  </div>
+
   <canvas id="gameCanvas"></canvas>
-  <p class="instructions">Use 🡅 and 🡇 arrows to move paddle</p>
+  
+  <div id="rules" class="overlay">
+    <div class="overlay-content">
+      <h2>Rules</h2>
+      <p>Use 🡅 and 🡇 arrows to move your paddle.</p>
+      <p>First to 10 points wins!</p>
+      <button id="closeRules">Close</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
 </html>
+
