@@ -2,29 +2,73 @@ body {
   margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
   background: linear-gradient(135deg, #1b2b6f, #0f1b3a);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
+  flex-direction: column;
 }
 
 h1 {
-  margin: 20px 0 10px;
   color: #FFD700;
   text-shadow: 2px 2px #000;
 }
 
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+button {
+  font-size: 18px;
+  margin: 10px;
+  padding: 10px 20px;
+  background: #FFD700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background: #ffea00;
+  transform: scale(1.05);
+}
+
 canvas {
+  display: none;
   border: 4px solid #FFD700;
   background: #0a1330;
-  display: block;
+  margin-top: 20px;
 }
 
 .instructions {
   margin-top: 10px;
   opacity: 0.8;
 }
+
+/* Overlay Rules */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content {
+  background: #142060;
+  padding: 20px 40px;
+  border-radius: 15px;
+  text-align: center;
+}
+
 
 
 
