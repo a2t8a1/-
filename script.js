@@ -1,179 +1,72 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.width = 600;
-canvas.height = 400;
-
-// Paddle & Ball
-const paddleWidth = 10, paddleHeight = 80;
-let playerY = (canvas.height - paddleHeight)/2;
-let aiY = (canvas.height - paddleHeight)/2;
-const paddleSpeed = 5;
-
-let ballX = canvas.width/2;
-let ballY = canvas.height/2;
-let ballRadius = 10;
-let ballSpeedX = 4;
-let ballSpeedY = 3;
-
-// Score
-let playerScore = 0;
-let aiScore = 0;
-let maxScore = 10;
-
-// Controls
-let upPressed = false;
-let downPressed = false;
-
-// Colors & Effects
-let colorful = true;
-let effects = [];
-
-// Elements
 const overlay = document.getElementById("overlay");
 const startBtn = document.getElementById("startBtn");
 const rulesBtn = document.getElementById("rulesBtn");
-const colorBtn = document.getElementById("colorBtn");
-const menuMessage = document.getElementById("menuMessage");
+const rulesOverlay = document.getElementById("rulesOverlay");
+const closeRulesBtn = document.getElementById("closeRulesBtn");
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-const rulesOverlay = document.getElementById("rules");
-const closeRules = document.getElementById("closeRules");
-
-// Keyboard Controls
-document.addEventListener("keydown", e => {
-  if(e.key === "ArrowUp" || e.key.toLowerCase() === "w") upPressed = true;
-  if(e.key === "ArrowDown" || e.key.toLowerCase() === "s") downPressed = true;
-});
-document.addEventListener("keyup", e => {
-  if(e.key === "ArrowUp" || e.key.toLowerCase() === "w") upPressed = false;
-  if(e.key === "ArrowDown" || e.key.toLowerCase() === "s") downPressed = false;
+// Start button
+startBtn.addEventListener("click", () => {
+  overlay.style.display = "none";
+  startGame();
 });
 
-// Overlay buttons
-startBtn.addEventListener("click", () => overlay.classList.add("hidden"));
-rulesBtn.addEventListener("click", () => rulesOverlay.classList.remove("hidden"));
-closeRules.addEventListener("click", () => rulesOverlay.classList.add("hidden"));
-colorBtn.addEventListener("click", () => {
-  colorful = !colorful;
-  menuMessage.textContent = colorful ? "Colors ON" : "Colors OFF";
+// Rules button
+rulesBtn.addEventListener("click", () => {
+  rulesOverlay.classList.remove("hidden");
 });
 
-// Game loop
-function draw() {
-  // Background
-  ctx.fillStyle = "#0a1330";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+// Close rules
+closeRulesBtn.addEventListener("click", () => {
+  rulesOverlay.classList.add("hidden");
+});
 
-  // Net
-  ctx.fillStyle = "#FFD700";
-  ctx.fillRect(canvas.width/2 - 1, 0, 2, canvas.height);
+// --- GAME LOGIC ---
+// Basic paddle and ball for now
+let ball = { x: 400, y: 250, vx: 4, vy: 4, radius: 10 };
+let paddle = { x: 350, y: 450, width: 100, height: 10, speed: 8 };
 
-  // Paddles
-  ctx.fillStyle = colorful ? "#00FFCC" : "#fff";
-  ctx.fillRect(10, playerY, paddleWidth, paddleHeight);
-  ctx.fillStyle = colorful ? "#FF3C00" : "#fff";
-  ctx.fillRect(canvas.width - 20, aiY, paddleWidth, paddleHeight);
-
-  // Ball (pulse effect)
-  let pulse = colorful ? 1 + 0.2*Math.sin(Date.now()/100) : 1;
-  ctx.fillStyle = colorful ? "#FFD700" : "#fff";
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius*pulse, 0, Math.PI*2);
-  ctx.fill();
-
-  // Scores
-  ctx.fillStyle = "#fff";
-  ctx.font = "24px Arial";
-  ctx.fillText(playerScore, canvas.width/4, 30);
-  ctx.fillText(aiScore, 3*canvas.width/4, 30);
-}
-
-// Game update logic
-function update() {
-  // Player
-  if(upPressed && playerY > 0) playerY -= paddleSpeed;
-  if(downPressed && playerY + paddleHeight < canvas.height) playerY += paddleSpeed;
-
-  // AI
-  if(aiY + paddleHeight/2 < ballY) aiY += 3;
-  else aiY -= 3;
-
-  // Move Ball
-  ballX += ballSpeedX;
-  ballY += ballSpeedY;
-
-  // Bounce walls
-  if(ballY + ballRadius > canvas.height || ballY - ballRadius < 0) ballSpeedY *= -1;
-
-  // Bounce paddles
-  if(ballX - ballRadius < 20 && ballY > playerY && ballY < playerY + paddleHeight) { ballSpeedX *= -1; addEffect(); }
-  if(ballX + ballRadius > canvas.width - 20 && ballY > aiY && ballY < aiY + paddleHeight) { ballSpeedX *= -1; addEffect(); }
-
-  // Score
-  if(ballX - ballRadius < 0) { aiScore++; resetBall(); }
-  if(ballX + ballRadius > canvas.width) { playerScore++; resetBall(); }
-
-  // Winner
-  if(playerScore >= maxScore || aiScore >= maxScore) {
-    overlay.classList.remove("hidden");
-    menuMessage.textContent = playerScore > aiScore ? "You Win! 🏆" : "AI Wins! 🤖";
-    resetGame();
-  }
-}
-
-// Reset Ball
-function resetBall() {
-  ballX = canvas.width/2;
-  ballY = canvas.height/2;
-  ballSpeedX = -ballSpeedX;
-  ballSpeedY = 3 * (Math.random() > 0.5 ? 1 : -1);
-}
-
-// Effects
-function addEffect() {
-  for(let i=0;i<5;i++){
-    effects.push({
-      x: ballX, y: ballY,
-      dx: (Math.random()-0.5)*4,
-      dy: (Math.random()-0.5)*4,
-      life: 20
-    });
-  }
-}
-
-function drawEffects() {
-  effects.forEach((e,i)=>{
-    ctx.fillStyle = `rgba(255,215,0,${e.life/20})`;
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, 3, 0, Math.PI*2);
-    ctx.fill();
-    e.x += e.dx;
-    e.y += e.dy;
-    e.life--;
-    if(e.life <= 0) effects.splice(i,1);
-  });
-}
-
-// Game loop
-function gameLoop() {
-  update();
-  draw();
-  drawEffects();
+function startGame() {
   requestAnimationFrame(gameLoop);
 }
 
-// Reset game
-function resetGame() {
-  playerScore = 0;
-  aiScore = 0;
-  playerY = (canvas.height - paddleHeight)/2;
-  aiY = (canvas.height - paddleHeight)/2;
-  effects = [];
-  resetBall();
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw ball
+  ctx.fillStyle = "#FFD700";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Move ball
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // Bounce off walls
+  if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.vx *= -1;
+  if (ball.y - ball.radius < 0) ball.vy *= -1;
+
+  // Paddle collision
+  if (ball.y + ball.radius > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+    ball.vy *= -1;
+  }
+
+  // Draw paddle
+  ctx.fillStyle = "#00FFCC";
+  ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+  requestAnimationFrame(gameLoop);
 }
 
-// Start loop immediately
-gameLoop();
+// Paddle movement
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") paddle.x -= paddle.speed;
+  if (e.key === "ArrowRight") paddle.x += paddle.speed;
+  paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, paddle.x));
+});
+
 
 
 
