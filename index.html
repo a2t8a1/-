@@ -1,65 +1,37 @@
-body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(135deg, #1b2b6f, #0f1b3a);
-  color: #fff;
-  overflow: hidden;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pin-Pon Deluxe</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-canvas {
-  display: block;
-  background: #0a1330;
-  margin: 0 auto;
-  border: 4px solid #FFD700;
-}
+<canvas id="gameCanvas"></canvas>
 
-/* Overlay */
-#overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  z-index: 10;
-}
+<!-- Start Menu Overlay -->
+<div id="overlay">
+  <h1>🎾 Pin-Pon Deluxe</h1>
+  <button id="startBtn">Start Game</button>
+  <button id="rulesBtn">Rules</button>
+  <button id="colorBtn">Toggle Colors</button>
+  <p id="menuMessage"></p>
+</div>
 
-#overlay h1 {
-  color: #FFD700;
-  font-size: 3em;
-  text-shadow: 2px 2px #000;
-  margin-bottom: 30px;
-}
+<!-- Rules Overlay -->
+<div id="rules" class="overlay hidden">
+  <div class="overlay-content">
+    <h2>Rules</h2>
+    <p>Use 🡅 and 🡇 arrows (or W/S on keyboard) to move your paddle.</p>
+    <p>First to 10 points wins!</p>
+    <button id="closeRules">Close</button>
+  </div>
+</div>
 
-#overlay button {
-  font-size: 20px;
-  margin: 10px;
-  padding: 12px 25px;
-  background: #FFD700;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+<script src="script.js"></script>
+</body>
+</html>
 
-#overlay button:hover {
-  background: #ffea00;
-  transform: scale(1.05);
-}
-
-#menuMessage {
-  margin-top: 15px;
-  font-size: 1.2em;
-  color: #00FFCC;
-}
-
-/* Rules overlay */
-.overlay.hidden { display: none; }
-.overlay-content {
-  background: #142060;
-  padding: 20px 40px;
-  border-radius: 15px;
-  text-align: center;
-}
 
 
