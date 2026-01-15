@@ -6,25 +6,56 @@ body {
   padding: 20px;
 }
 
-h1 {
-  margin-bottom: 20px;
-}
-
 button {
-  padding: 15px 25px;
+  padding: 14px 24px;
   font-size: 18px;
   background: #d4af37;
   color: #0a1330;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  margin: 20px;
 }
 
 .team {
-  background: #142060;
-  margin: 15px auto;
+  margin: 10px auto;
   padding: 15px;
   border-radius: 12px;
   width: 90%;
-  max-width: 600px;
+  max-width: 500px;
+  cursor: pointer;
+  font-weight: bold;
 }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #142060;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.hidden {
+  display: none;
+}
+
+#closeBtn {
+  float: right;
+  background: red;
+  color: white;
+  border-radius: 50%;
+}
+
