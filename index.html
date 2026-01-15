@@ -1,33 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>UCL Fixture Game</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pin-Pon Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>🎾 Pin-Pon Game</h1>
+  <canvas id="gameCanvas"></canvas>
+  <p class="instructions">Use 🡅 and 🡇 arrows to move paddle</p>
 
-<header>
-  <h1>🏆 UEFA Champions League</h1>
-  <p class="subtitle">Interactive Fixture Draw</p>
-  <button id="drawBtn">🎲 Draw Fixtures</button>
-</header>
-
-<main id="teams"></main>
-
-<!-- MODAL -->
-<div id="modal" class="modal hidden">
-  <div id="modalContent" class="modal-card">
-    <span id="closeBtn">✖</span>
-    <h2 id="modalTitle"></h2>
-    <p id="modalSlogan"></p>
-    <div id="modalFixtures"></div>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
-
